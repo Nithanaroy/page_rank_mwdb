@@ -105,4 +105,6 @@ idxwinf.put('win', true);
 idxwinf.put('f', true);
 coll.createIndex(idxwinf);
 
+close(mongoClient);
+
 end

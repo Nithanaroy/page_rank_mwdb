@@ -1,4 +1,4 @@
-function [sim_matrix, a_matrix] = adj_matrix(sim_files_dir, threshold, sym_dist)
+function [sim_matrix, a_matrix] = adj_matrix(sim_files_dir, threshold, assume_symm_dist)
 
 %Getting user input for similarity measure
 disp('1. Euclidean Measure');
@@ -28,8 +28,8 @@ a_matrix = zeros(files_count);
 %based on user input, create simulation simulation similarity matrix
 for i=1:files_count
     
-    if(sym_dist) % Compute only upper half of the matrix if distance is symmetric
-        start = i + 1;
+    if(assume_symm_dist) % Compute only upper half of the matrix if distance is symmetric
+        start = i;
     else
         start = 1;
     end
@@ -60,20 +60,17 @@ for i=1:files_count
                 error('Incorrect option chosen. Run again.');
         end
         
-        sim_matrix(i,j) = sim_measure; % sim_func(files(i).name, files(j).name, measureName);
+        sim_matrix(i,j) = sim_measure;
     end
 end
 
+if (assume_symm_dist)
+    sim_matrix = triu(sim_matrix) + triu(sim_matrix, 1)'; % copy upper half triangle to lower half
+end
+
 % Construct adjancency matrix using the threshold
-for i = 1:files_count
-    
-    if(sym_dist) % Compute only upper half of the matrix if distance is symmetric
-        start = i + 1;
-    else
-        start = 1;
-    end
-    
-    for j = start:files_count
+for i = 1:files_count  
+    for j = 1:files_count
         if sim_matrix(i, j) > threshold
             a_matrix(i, j) = sim_matrix(i, j);
         end

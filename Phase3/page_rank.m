@@ -20,6 +20,17 @@ function [ranks, topk_values, topk_nodes] = page_rank(k, p, sim_files_dir, thres
     topk_values = sorted_ranks(1:k);
     
     files = dir(fullfile(sim_files_dir,'/*.csv'));
-    ranked_nodes = files((sorted_ranks_indices));
+    ranked_nodes = extract_file_names_as_nums(files((sorted_ranks_indices)));
     topk_nodes = ranked_nodes(1:k);
+    
+    % x-axis - simulation file names
+    % y-axis - their corresponding proabilities (ranks)
+    bar(topk_nodes, topk_values);
+    
+    function names = extract_file_names_as_nums(files)
+        names = zeros(1, size(files, 1));
+        for i = 1:size(files, 1)
+            names(i) = str2double(char(regexp(files(i).name, '^\d*', 'match')));
+        end
+    end
 end

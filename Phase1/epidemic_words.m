@@ -98,12 +98,12 @@ idxfst = BasicDBObject();
 idxfst.put('f', true);
 idxfst.put('s', true);
 idxfst.put('t', true);
-coll.createIndex(idxfst, BasicDBObject('unique', true));
-coll.createIndex(BasicDBObject('str', true));
+% coll.createIndex(idxfst, BasicDBObject('unique', true));
+% coll.createIndex(BasicDBObject('str', true));
 idxwinf = BasicDBObject();
 idxwinf.put('win', true);
 idxwinf.put('f', true);
-coll.createIndex(idxwinf);
+% coll.createIndex(idxwinf);
 
 close(mongoClient);
 

@@ -22,6 +22,8 @@ function [ranks, topk_values, topk_nodes] = random_walk(k, p, sim_files_dir, res
     % x-axis - simulation file names
     % y-axis - their corresponding proabilities (ranks)
     bar(topk_nodes, topk_values);
+    figure
+    visualize(topk_values, topk_nodes);
     
     function names = extract_file_names_as_nums(files)
         names = zeros(1, size(files, 1));

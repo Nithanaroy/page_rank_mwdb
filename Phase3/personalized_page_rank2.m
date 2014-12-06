@@ -52,6 +52,8 @@ function [ranks, topk_values, topk_nodes] = personalized_page_rank2(K, q1, q2, s
         uq = temp;
     end
 
+    K = K + 2;
+    
     ranks = uq(1:nodes_count); % only consider simulation files as others are features (distinct widnows)
     [sorted_ranks, sorted_ranks_indices] = sort(ranks, 'descend');
     topk_values = sorted_ranks(1:K);
@@ -62,6 +64,8 @@ function [ranks, topk_values, topk_nodes] = personalized_page_rank2(K, q1, q2, s
     % x-axis - simulation file names
     % y-axis - their corresponding proabilities (ranks)
     bar(topk_nodes, topk_values);
+    figure
+    visualize(topk_values, topk_nodes);
     
     close(mongoClient);
     
@@ -113,8 +117,8 @@ function [ranks, topk_values, topk_nodes] = personalized_page_rank2(K, q1, q2, s
                     % symmetric
                     mmg(nodes_count + k, nodes_count + l) = mmg(nodes_count + l, nodes_count + k);
                 else
-                    mmg(nodes_count + k, nodes_count + l) = get_exact_window_percent_match(distinct_windows(k, :), distinct_windows(l, :));
-                    %                     mmg(nodes_count + k, nodes_count + l) = euclidean_func(distinct_windows(k, :), distinct_windows(l, :));
+%                     mmg(nodes_count + k, nodes_count + l) = get_exact_window_percent_match(distinct_windows(k, :), distinct_windows(l, :));
+                      mmg(nodes_count + k, nodes_count + l) = euclidean_func(distinct_windows(k, :), distinct_windows(l, :));
                 end
             end
         end

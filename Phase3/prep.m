@@ -4,7 +4,7 @@
 
 w = 10; % Window length
 h = 10; % Shift length
-r = 4;  % Quantization resolution/bands
+r = 5;  % Quantization resolution/bands
 
 word = epidemic_words( 'data', w, h, r, 0 );
 % win_avg( word, 'LocationMatrix.csv', 1 );
@@ -12,3 +12,5 @@ word = epidemic_words( 'data', w, h, r, 0 );
 
 LOCATION_MATRIX = 'LocationMatrix.csv';
 WIN_SEARCH_DIST = 0.02;
+
+warning off

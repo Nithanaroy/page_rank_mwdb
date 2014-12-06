@@ -9,7 +9,7 @@ function [ranks, topk_values, topk_nodes] = page_rank_with_restart(q1, q2, k, p,
     index = get_index_for_file(files, q2);
     reset_matrix(index, :) = 0.5;
 
-    [ranks, topk_values, topk_nodes] = random_walk(k, p, sim_files_dir, reset_matrix, threshold, assume_symm_dist, D);
+    [ranks, topk_values, topk_nodes] = random_walk(k+2, p, sim_files_dir, reset_matrix, threshold, assume_symm_dist, D);
 
     function index = get_index_for_file(files, query)
         for i = 1:size(files, 1)

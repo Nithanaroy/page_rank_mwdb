@@ -13,7 +13,7 @@ function [ranks, topk_values, topk_nodes] = page_rank_with_restart(q1, q2, k, p,
 
     function index = get_index_for_file(files, query)
         for i = 1:size(files, 1)
-            if files(i).name == query
+            if strcmp(files(i).name, query) == 1
                 index = i;
                 break;
             end

@@ -16,9 +16,10 @@ function [ranks, topk_values, topk_nodes] = personalized_page_rank2(K, q1, q2, s
     
     mmg = zeros(nodes_count + size(distinct_windows, 1));
     
-    if(D)
-        mmg = [1,0,0.678881660945381,0,0.537028855489255,1,0,1;0,1,0,0.664939236220188,0,1,0,1;0.678881660945381,0,1,0,0.719067432876597,1,1,0;0,0.664939236220188,0,1,0,1,1,0;0.537028855489255,0,0.719067432876597,0,1,1,1,0;1,1,1,1,1,1,0.900000000000000,0.800000000000000;0,0,1,1,1,0.900000000000000,1,0.900000000000000;1,1,0,0,0,0.800000000000000,0.900000000000000,1];
-    else
+%     if(D)
+%         mmg = [1,0,0.678881660945381,0,0.537028855489255,1,0,1;0,1,0,0.664939236220188,0,1,0,1;0.678881660945381,0,1,0,0.719067432876597,1,1,0;0,0.664939236220188,0,1,0,1,1,0;0.537028855489255,0,0.719067432876597,0,1,1,1,0;1,1,1,1,1,1,0.900000000000000,0.800000000000000;0,0,1,1,1,0.900000000000000,1,0.900000000000000;1,1,0,0,0,0.800000000000000,0.900000000000000,1];
+%     else
+        
         % Map files and windows
         for file = 1:nodes_count
             filter = BasicDBObject();
@@ -30,14 +31,15 @@ function [ranks, topk_values, topk_nodes] = personalized_page_rank2(K, q1, q2, s
         end
 
         % Map files to files based on similarity and threshold
-        [~, mmg(1:nodes_count, 1:nodes_count)] = adj_matrix(sim_files_dir, threshold, assume_symm_dist);
+        [~, mmg(1:nodes_count, 1:nodes_count)] = adj_matrix(sim_files_dir, threshold, assume_symm_dist, D);
 
         % Map windows and files. Just copying the top-right to bottom-left
         mmg(nodes_count + 1: end, 1:nodes_count) = transpose(mmg(1:nodes_count, nodes_count+1:end));
 
         % Map windows to windows: exact match % or euclidean distance
         map_windows_to_windows();
-    end
+        
+%     end
     
     % MMG Algo
     vq = form_reset_vector();

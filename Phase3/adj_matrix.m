@@ -1,75 +1,83 @@
-function [sim_matrix, a_matrix] = adj_matrix(sim_files_dir, threshold, assume_symm_dist)
+function [sim_matrix, a_matrix] = adj_matrix(sim_files_dir, threshold, assume_symm_dist, D)
 
-%Getting user input for similarity measure
-disp('1. Euclidean Measure');
-disp('2. DTW');
-disp('3. Dot product Similarity Word');
-disp('4. Dot product Similarity Avg File');
-disp('5. Dot product Similarity Diff File');
-disp('6. Similarity Weighted');
-disp('7. Similarity Weighted for Avg File');
-disp('8. Similarity Weighted for Diff File');
-choice = input('Please select the similarity measure: ');
+global sim_matrix_s1;
 
 % Get all csv files in directory
 files = dir(fullfile(sim_files_dir,'/*.csv'));
 files_count = size(files, 1);
 
-LOCATION_MATRIX = 'LocationMatrix.csv';
-WIN_SEARCH_DIST = 0.02;
-
-sim_matrix = zeros(files_count);
-
-% Adjacency matrix
-% There is an edge between two sim files (nodes) if their similarity
-% measure beyond `threshold`
-a_matrix = zeros(files_count);
-
-%based on user input, create simulation simulation similarity matrix
-for i=1:files_count
+if(D)
+    % uses a global variable defined in the static workspace of matlab
+    sim_matrix = sim_matrix_s1;
+else
+    %Getting user input for similarity measure
+    disp('1. Euclidean Measure');
+    disp('2. DTW');
+    disp('3. Dot product Similarity Word');
+    disp('4. Dot product Similarity Avg File');
+    disp('5. Dot product Similarity Diff File');
+    disp('6. Similarity Weighted');
+    disp('7. Similarity Weighted for Avg File');
+    disp('8. Similarity Weighted for Diff File');
+    choice = input('Please select the similarity measure: ');    
     
-    if(assume_symm_dist) % Compute only upper half of the matrix if distance is symmetric
-        start = i;
-    else
-        start = 1;
-    end
+    LOCATION_MATRIX = 'LocationMatrix.csv';
+    WIN_SEARCH_DIST = 0.02;
     
-    for j=start:files_count
+    sim_matrix = zeros(files_count);
+    
+    % Adjacency matrix
+    % There is an edge between two sim files (nodes) if their similarity
+    % measure beyond `threshold`
+    a_matrix = zeros(files_count);
+    
+    %based on user input, create simulation simulation similarity matrix
+    for i=1:files_count
         
-        firstFile = files(i).name;
-        secondFile = files(j).name;
-        
-        switch choice
-            case 1
-                sim_measure = sim_task1(firstFile, secondFile,'euclidean_func');
-            case 2
-                sim_measure = sim_task1(firstFile, secondFile,'dtw');
-            case 3
-                sim_measure = sim(firstFile, secondFile,'word_file');
-            case 4
-                sim_measure = sim(firstFile, secondFile, 'word_file_avg');
-            case 5
-                sim_measure = sim(firstFile, secondFile, 'word_file_diff');
-            case 6
-                sim_measure = sim_weighted( 'word_file', LOCATION_MATRIX, firstFile, secondFile, WIN_SEARCH_DIST);
-            case 7
-                sim_measure = sim_weighted( 'word_file_avg', LOCATION_MATRIX, firstFile, secondFile, WIN_SEARCH_DIST);
-            case 8
-                sim_measure = sim_weighted( 'word_file_diff', LOCATION_MATRIX, firstFile, secondFile, WIN_SEARCH_DIST);
-            otherwise
-                error('Incorrect option chosen. Run again.');
+        if(assume_symm_dist) % Compute only upper half of the matrix if distance is symmetric
+            start = i;
+        else
+            start = 1;
         end
         
-        sim_matrix(i,j) = sim_measure;
+        for j=start:files_count
+            
+            firstFile = files(i).name;
+            secondFile = files(j).name;
+            
+            switch choice
+                case 1
+                    sim_measure = sim_task1(firstFile, secondFile,'euclidean_func');
+                case 2
+                    sim_measure = sim_task1(firstFile, secondFile,'dtw');
+                case 3
+                    sim_measure = sim(firstFile, secondFile,'word_file');
+                case 4
+                    sim_measure = sim(firstFile, secondFile, 'word_file_avg');
+                case 5
+                    sim_measure = sim(firstFile, secondFile, 'word_file_diff');
+                case 6
+                    sim_measure = sim_weighted( 'word_file', LOCATION_MATRIX, firstFile, secondFile, WIN_SEARCH_DIST);
+                case 7
+                    sim_measure = sim_weighted( 'word_file_avg', LOCATION_MATRIX, firstFile, secondFile, WIN_SEARCH_DIST);
+                case 8
+                    sim_measure = sim_weighted( 'word_file_diff', LOCATION_MATRIX, firstFile, secondFile, WIN_SEARCH_DIST);
+                otherwise
+                    error('Incorrect option chosen. Run again.');
+            end
+            
+            sim_matrix(i,j) = sim_measure;
+        end
     end
-end
-
-if (assume_symm_dist)
-    sim_matrix = triu(sim_matrix) + triu(sim_matrix, 1)'; % copy upper half triangle to lower half
+    
+    if (assume_symm_dist)
+        sim_matrix = triu(sim_matrix) + triu(sim_matrix, 1)'; % copy upper half triangle to lower half
+    end
+    
 end
 
 % Construct adjancency matrix using the threshold
-for i = 1:files_count  
+for i = 1:files_count
     for j = 1:files_count
         if sim_matrix(i, j) > threshold
             a_matrix(i, j) = sim_matrix(i, j);

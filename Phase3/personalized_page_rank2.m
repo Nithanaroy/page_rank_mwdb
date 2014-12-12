@@ -6,6 +6,9 @@ function [ranks, topk_values, topk_nodes] = personalized_page_rank2(K, q1, q2, s
     files = dir(fullfile(sim_files_dir,'/*.csv'));
     nodes_count = size(files, 1);
     
+    % Map files to files based on similarity and threshold
+    [~, mmg(1:nodes_count, 1:nodes_count)] = adj_matrix(sim_files_dir, threshold, assume_symm_dist, D);
+    
     javaaddpath('mongo-java-driver-2.12.3.jar');
     import('com.mongodb.*');
     mongoClient = MongoClient();
@@ -21,17 +24,17 @@ function [ranks, topk_values, topk_nodes] = personalized_page_rank2(K, q1, q2, s
 %     else
         
         % Map files and windows
+        file_names = extract_file_names_as_nums(files);
         for file = 1:nodes_count
             filter = BasicDBObject();
-            filter.put('f', num2str(file));
+            filter.put('f', num2str(file_names(file)));
             rows = db_object_to_array(coll.distinct('win', filter).toArray());
 
             [~, indices] = ismember(rows, distinct_windows, 'rows');
             mmg(file, indices + nodes_count) = 1;
         end
 
-        % Map files to files based on similarity and threshold
-        [~, mmg(1:nodes_count, 1:nodes_count)] = adj_matrix(sim_files_dir, threshold, assume_symm_dist, D);
+        
 
         % Map windows and files. Just copying the top-right to bottom-left
         mmg(nodes_count + 1: end, 1:nodes_count) = transpose(mmg(1:nodes_count, nodes_count+1:end));
